@@ -24,8 +24,18 @@ jobs:
       run: reg add "HKCU\SOFTWARE\Microsoft\VisualStudio\17.0_Config\MSBuild" /t REG_DWORD /v EnableOutOfProcBuild /d 0 /f
 
     - name: Build Solution and MSI
-      shell: cmd
-      run: '"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\devenv.com" EstimationApp.sln /Build "Release"'
+      run: |
+        # 1. Dynamically find the Visual Studio path
+        $devenv = vswhere -latest -find Common7\IDE\devenv.com | Select-Object -First 1
+        
+        # 2. Dynamically find your solution file
+        $sln = Get-ChildItem -Filter *.sln -Recurse | Select-Object -First 1
+        
+        Write-Host "Found Visual Studio at: $devenv"
+        Write-Host "Found Solution at: $($sln.FullName)"
+        
+        # 3. Execute the build safely using the PowerShell call operator (&)
+        & $devenv $sln.FullName /Build "Release"
 
     - name: Update XML Manifest
       run: |
