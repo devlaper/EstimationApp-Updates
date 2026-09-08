@@ -1,0 +1,51 @@
+name: Build and Release MSI
+
+on:
+  push:
+    tags:
+      - 'v*' # Triggers the automation ONLY when you push a tag like v1.0.2
+
+permissions:
+  contents: write # Allows the bot to create releases and update the XML
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Enable Visual Studio Installer Projects
+      uses: dlemstra/setup-vdproj@v1
+
+    - name: Build Solution and MSI
+      run: '"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\devenv.com" EstimationApp.sln /Build "Release"'
+
+    - name: Update XML Manifest
+      run: |
+        $xmlPath = "EstimationApp/updateinfo.xml"
+        $version = "${{ github.ref_name }}".TrimStart('v') + ".0"
+        $url = "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/EstimationApp.Setup.msi"
+        $xml = [xml](Get-Content $xmlPath)
+        $xml.item.version = $version
+        $xml.item.url = $url
+        $xml.Save($xmlPath)
+
+    - name: Commit and Push XML
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add EstimationApp/updateinfo.xml
+        git commit -m "Auto-update XML for ${{ github.ref_name }}"
+        git push origin HEAD:main
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: EstimationApp.Setup/Release/EstimationApp.Setup.msi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
