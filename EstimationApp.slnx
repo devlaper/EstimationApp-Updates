@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="EstimationApp.Setup/EstimationApp.Setup.vdproj" Type="Installer">
+    <Build />
+  </Project>
+  <Project Path="EstimationApp/EstimationApp.csproj" />
+</Solution>

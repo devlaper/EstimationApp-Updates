@@ -1,0 +1,87 @@
+﻿<Window x:Class="EstimationApp.ItemSearchWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Search Master Database" Height="600" Width="1000"
+        WindowStartupLocation="CenterOwner"
+        Background="#FFFFFF"
+        FontFamily="Segoe UI">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Search Box & Sort Controls -->
+        <Grid Grid.Row="0" Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBox x:Name="TxtSearch" Grid.Column="0" Height="40" FontSize="16" Padding="10,8" 
+                     BorderBrush="#0078D7" BorderThickness="2" 
+                     TextChanged="TxtSearch_TextChanged" PreviewKeyDown="TxtSearch_PreviewKeyDown"/>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="15,0,0,0">
+                <TextBlock Text="Sort By:" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="#555555" FontWeight="SemiBold"/>
+                <ComboBox x:Name="ComboSort" Width="160" Height="40" VerticalContentAlignment="Center" Padding="10,0" SelectionChanged="ComboSort_SelectionChanged">
+                    <ComboBoxItem Content="Default Order" IsSelected="True"/>
+                    <ComboBoxItem Content="Work Name (A-Z)"/>
+                </ComboBox>
+            </StackPanel>
+        </Grid>
+
+        <!-- Highly optimized ListView with Card UI and Single-Click -->
+        <!-- Highly optimized ListView with Card UI, Single-Click, and Forced Wrapping -->
+        <ListView x:Name="ListItems" Grid.Row="1" 
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
+                  VirtualizingStackPanel.IsVirtualizing="True"
+                  VirtualizingPanel.VirtualizationMode="Recycling"
+                  VirtualizingPanel.ScrollUnit="Pixel"
+                  BorderBrush="#DDDDDD" BorderThickness="1">
+
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <Setter Property="Cursor" Value="Hand"/>
+                    <EventSetter Event="PreviewMouseLeftButtonUp" Handler="ListViewItem_Click"/>
+                </Style>
+            </ListView.ItemContainerStyle>
+
+            <!-- The Card Layout -->
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <!-- Ensure the Border doesn't stretch beyond the ListView viewport -->
+                    <Border Padding="10,12" BorderBrush="#EEEEEE" BorderThickness="0,0,0,1" Background="Transparent">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="140"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Left Side: Text Hierarchy -->
+                            <StackPanel Grid.Column="0" Margin="0,0,20,0">
+                                <TextBlock Text="{Binding WorkName}" FontSize="11" Foreground="#A0A0A0" FontWeight="Bold" TextWrapping="Wrap" Margin="0,0,0,2"/>
+                                <TextBlock Text="{Binding NameOfItem}" FontSize="15" Foreground="#222222" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,0,0,2"/>
+                                <TextBlock Text="{Binding SubItem}" FontSize="13" Foreground="#555555" TextWrapping="Wrap" Margin="0,0,0,6"/>
+
+                                <!-- Changed from Trimming to Wrapping -->
+                                <TextBlock Text="{Binding Description}" FontSize="12" Foreground="#999999" FontStyle="Italic" TextWrapping="Wrap"/>
+                            </StackPanel>
+
+                            <!-- Right Side: Metrics and Codes -->
+                            <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <Border Background="#FFF4CE" CornerRadius="3" Padding="6,2" HorizontalAlignment="Right" Margin="0,0,0,8">
+                                    <TextBlock Text="{Binding Code, StringFormat=DSR: {0}}" FontSize="11" FontWeight="Bold" Foreground="#8A6D3B"/>
+                                </Border>
+                                <TextBlock Text="{Binding Rate, StringFormat=₹ {0:N2}}" FontSize="18" FontWeight="Bold" Foreground="#005A9E" HorizontalAlignment="Right"/>
+                                <TextBlock Text="{Binding Unit, StringFormat=per {0}}" FontSize="12" Foreground="#888888" HorizontalAlignment="Right" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+</Window>

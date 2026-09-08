@@ -1,0 +1,179 @@
+﻿<Window x:Class="EstimationApp.ExtendedExplorerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        Title="Immersive Project Explorer" WindowState="Maximized"
+        Background="#18181B" FontFamily="Segoe UI, sans-serif"
+        PreviewKeyDown="Window_PreviewKeyDown">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- GLOBAL STYLES FOR MODERN ROUNDED BUTTONS & TYPOGRAPHY -->
+        <Grid.Resources>
+            <Style TargetType="Button">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="Segoe UI"/>
+            </Style>
+        </Grid.Resources>
+
+        <!-- TOP RIBBON: Prominent Search & Views -->
+        <Border Grid.Row="0" Background="#18181B" Padding="25,20,25,15" BorderBrush="#27272A" BorderThickness="0,0,0,1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="400"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- NEW: Modern, Prominent Search Bar -->
+                <Border Grid.Column="0" Background="#27272A" CornerRadius="8" BorderThickness="1" BorderBrush="#3F3F46" Padding="15,8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <!-- Search Icon -->
+                        <TextBlock Grid.Column="0" Text="🔍" Foreground="#888888" FontSize="16" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <!-- Input Field -->
+                        <TextBox x:Name="TxtSearch" Grid.Column="1" Background="Transparent" Foreground="#FFFFFF" BorderThickness="0" FontSize="15" VerticalAlignment="Center" TextChanged="TxtSearch_TextChanged"/>
+                    </Grid>
+                </Border>
+
+                <!-- Single Toggle Button for Sorting -->
+                <Button Grid.Column="2" x:Name="BtnToggleSort" Content="⮂ Group by Building" Margin="0,0,25,0" Background="#27272A" Foreground="#5DA2FF" Padding="15,10" Cursor="Hand" Click="BtnToggleSort_Click" FontSize="14" FontWeight="SemiBold"/>
+
+                <!-- Always-On Cost Meter with GST Toggle -->
+                <Border Grid.Column="3" Background="#1E1E24" CornerRadius="8" Padding="20,5" BorderThickness="1" BorderBrush="#333333">
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox x:Name="ChkIncludeGST" Content="+ 18% GST" Foreground="#A0A0A0" FontSize="13" VerticalAlignment="Center" Margin="0,0,20,0" Checked="CostMeter_Updated" Unchecked="CostMeter_Updated"/>
+                        <TextBlock x:Name="TxtLiveCost" Text="₹ 0.00" Foreground="#10B981" FontSize="26" FontWeight="Black" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- SECOND RIBBON: Real-Time Bulk Actions -->
+        <Border Grid.Row="1" Background="#141417" Padding="25,12" BorderBrush="#27272A" BorderThickness="0,0,0,1">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="BULK ATTRIBUTES" Foreground="#666666" FontSize="12" VerticalAlignment="Center" Margin="0,0,20,0" FontWeight="Bold"/>
+                <!-- Real-Time Editable Combo Boxes -->
+                <!-- Real-Time Editable Combo Boxes -->
+                <ComboBox x:Name="ComboBulkBuilding" Width="180" Margin="0,0,12,0" IsEditable="True" SelectionChanged="ComboBulkBuilding_SelectionChanged" FontSize="13"/>
+
+                <xctk:CheckComboBox x:Name="ComboBulkFloor" Width="180" Margin="0,0,12,0" Delimiter=", " ItemSelectionChanged="ComboBulkFloor_ItemSelectionChanged" FontSize="13"/>
+
+                <ComboBox x:Name="ComboBulkMarker" Width="140" Margin="0,0,20,0" IsEditable="True" SelectionChanged="ComboBulkMarker_SelectionChanged" FontSize="13"/>
+                
+                <Border Width="1" Background="#333333" Margin="10,5,20,5"/>
+
+                <Button Content="Duplicate" Background="#27272A" Foreground="#E2E2E2" Padding="20,8" Margin="0,0,12,0" Cursor="Hand" Click="BtnDuplicate_Click" FontSize="13" FontWeight="SemiBold"/>
+                <Button Content="Delete (Del)" Background="#3D1A1A" Foreground="#FF6B6B" Padding="20,8" Cursor="Hand" Click="BtnBulkDelete_Click" FontSize="13" FontWeight="SemiBold"/>
+            </StackPanel>
+        </Border>
+
+        <!-- MAIN AREA: Immersive Card Grid -->
+        <ListView x:Name="ListExplorer" Grid.Row="2" Background="Transparent" BorderThickness="0" 
+                  SelectionMode="Extended" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  SelectionChanged="ListExplorer_SelectionChanged">
+
+            <ListView.ContextMenu>
+                <ContextMenu>
+                    <!-- NEW: Cross-Instance Actions -->
+                    <MenuItem Header="Copy Selected Items (Ctrl+C)" Click="MenuCopyItems_Click"/>
+                    <MenuItem Header="Paste Items (Ctrl+V)" Click="MenuPasteItems_Click"/>
+                    <Separator/>
+                    <MenuItem Header="Copy Measurement Rows" Click="MenuCopyRows_Click"/>
+                    <MenuItem Header="Replace &amp; Paste Rows" Click="MenuPasteRows_Click"/>
+                </ContextMenu>
+            </ListView.ContextMenu>
+
+            <!-- KEEP YOUR ITEMS PANEL, GROUP STYLE, AND ITEM TEMPLATES HERE -->
+
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal" Margin="15"/>
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+
+            <!-- Grouping Headers -->
+            <ListView.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" Foreground="#FFD700" FontSize="18" FontWeight="Bold" Margin="5,15,0,10"/>
+                        </DataTemplate>
+                    </GroupStyle.HeaderTemplate>
+                </GroupStyle>
+            </ListView.GroupStyle>
+
+            <!-- Card Template -->
+            <!-- Card Template -->
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <!-- NEW: Background is bound to the dynamically generated BackgroundHex -->
+                    <Border Width="240" Height="90" Background="{Binding BackgroundHex}" CornerRadius="6" Margin="5" Padding="10" 
+                            BorderThickness="4,1,1,1" BorderBrush="{Binding MarkerColor, TargetNullValue=#3F3F46, FallbackValue=#3F3F46}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- NEW: Split typography for giant leading numbers -->
+                            <TextBlock Grid.Row="0" TextTrimming="CharacterEllipsis" Margin="0,0,0,3">
+                                <Run Text="{Binding WorkNumberDisplay, Mode=OneWay}" FontSize="24" FontWeight="Black" Foreground="#FFFFFF"/>
+                                <Run Text="{Binding WorkTitle, Mode=OneWay}" FontSize="13" FontWeight="Bold" Foreground="#E2E2E2"/>
+                            </TextBlock>
+
+                            <TextBlock Grid.Row="1" Text="{Binding LocationDisplay}" Foreground="#A0A0A0" FontSize="11" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Grid.Row="2" Text="{Binding QtyDisplay}" Foreground="#5DA2FF" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+
+            <!-- Selected Item Styling -->
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Margin" Value="0"/>
+                    <Setter Property="Padding" Value="0"/>
+                    <Setter Property="Cursor" Value="Hand"/>
+                    <EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListViewItem">
+                                <Border x:Name="Bd" Background="Transparent" CornerRadius="6" Padding="2">
+                                    <ContentPresenter/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="Bd" Property="Background" Value="#335DA2FF"/>
+                                        <Setter TargetName="Bd" Property="BorderBrush" Value="#5DA2FF"/>
+                                        <Setter TargetName="Bd" Property="BorderThickness" Value="1"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListView.ItemContainerStyle>
+        </ListView>
+    </Grid>
+</Window>

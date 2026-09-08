@@ -1,0 +1,48 @@
+﻿<Window x:Class="EstimationApp.FloorMappingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        Title="Map Imported Floors" Height="450" Width="550"
+        WindowStartupLocation="CenterScreen"
+        FontFamily="Segoe UI, sans-serif"
+        Background="#1E1E24">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="MAP IMPORTED FLOORS" Foreground="#888890" FontSize="12" FontWeight="Bold" Margin="0,0,0,5"/>
+        <TextBlock Grid.Row="0" Text="The file contains custom or legacy floor names. Please select all standard floors that apply to each imported item." Foreground="#A0A0A0" FontSize="11" TextWrapping="Wrap" Margin="0,20,0,15"/>
+
+        <DataGrid x:Name="GridFloorMaps" Grid.Row="1" AutoGenerateColumns="False" CanUserAddRows="False" Background="#2D2D36" BorderThickness="0" RowHeight="35" Foreground="Black">
+            <DataGrid.Columns>
+                <!-- Read Only Imported Name -->
+                <DataGridTextColumn Header="Imported Floor Name" Binding="{Binding ImportedFloor}" Width="*" IsReadOnly="True">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="Margin" Value="10,0"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <!-- Multi-Select Dropdown for Target Names -->
+                <DataGridTemplateColumn Header="Map to Standard Floor(s)" Width="250">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <xctk:CheckComboBox ItemsSource="{Binding AvailableStandardFloors}" 
+                                                SelectedItemsOverride="{Binding SelectedMappedFloors}" 
+                                                Delimiter=", "
+                                                VerticalAlignment="Center" Margin="5,0"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Button Grid.Row="2" x:Name="BtnConfirm" Content="Confirm &amp; Import ➞" Height="40" Background="#10B981" Foreground="White" FontSize="13" FontWeight="Bold" BorderThickness="0" Cursor="Hand" Margin="0,15,0,0" Click="BtnConfirm_Click"/>
+    </Grid>
+</Window>
