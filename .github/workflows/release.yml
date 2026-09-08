@@ -58,6 +58,6 @@ jobs:
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
-        files: EstimationApp.Setup/Release/EstimationApp.Setup.msi
+        files: '**/*.msi'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
