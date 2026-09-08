@@ -20,7 +20,8 @@ jobs:
       uses: microsoft/setup-msbuild@v2
 
     - name: Enable Visual Studio Installer Projects
-      uses: dlemstra/setup-vdproj@v1
+      shell: cmd
+      run: reg add "HKCU\SOFTWARE\Microsoft\VisualStudio\17.0_Config\MSBuild" /t REG_DWORD /v EnableOutOfProcBuild /d 0 /f
 
     - name: Build Solution and MSI
       run: '"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\devenv.com" EstimationApp.sln /Build "Release"'
