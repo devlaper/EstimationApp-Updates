@@ -24,6 +24,7 @@ jobs:
       run: reg add "HKCU\SOFTWARE\Microsoft\VisualStudio\17.0_Config\MSBuild" /t REG_DWORD /v EnableOutOfProcBuild /d 0 /f
 
     - name: Build Solution and MSI
+      shell: cmd
       run: '"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\devenv.com" EstimationApp.sln /Build "Release"'
 
     - name: Update XML Manifest
